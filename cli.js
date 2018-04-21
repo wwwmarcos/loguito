@@ -5,7 +5,7 @@ const axios = require('axios')
 const minimist = require('minimist')
 const uuid = require('uuid')
 
-const { USER_CONFIG_FILE_PATH, API_URL } = require('./config')
+const { USER_CONFIG_FILE_PATH, API_URL, SITE_URL } = require('./config')
 const userConfig = require(USER_CONFIG_FILE_PATH)
 
 const [COMMAND, ...ARGUMENTS] = process.argv.slice(2)
@@ -14,7 +14,7 @@ const { loguitoname } = minimist(ARGUMENTS)
 const SESSION_ID = loguitoname || uuid()
 
 const sendData = stdout => axios.post(API_URL, {
-  data: stdout.toString('utf-8'),
+  data: stdout,
   sessionId: SESSION_ID,
   userId: userConfig.id
 })
@@ -25,7 +25,11 @@ const verifySessionId = ({ sessionId, userId }) =>
 const addDataListener = (stdout, fn) =>
   stdout.on('data', data => fn(data.toString('utf-8')))
 
-const command = spawn(COMMAND, ARGUMENTS)
+const pipeStdio = ({ stdout, stdin, stderr }) => {
+  stdout.pipe(process.stdout)
+  stdin.pipe(process.stdin)
+  stderr.pipe(process.stderr)
+}
 
 const start = async () => {
   try {
@@ -34,21 +38,17 @@ const start = async () => {
       userId: userConfig.id
     })
   } catch (error) {
-    if (error.code === 'ECONNREFUSED') {
-      return console.log('No internet connection')
-    }
-
-    console.log(error.response.data)
+    console.log(error && error.response ? error.response.data : error)
     process.exit(1)
   }
 
-  console.log(`Access your logs on https://loguito.js.org/${SESSION_ID}`)
+  console.log(`Access your logs on ${SITE_URL}/${SESSION_ID}`)
   console.log('----')
-  addDataListener(command.stdout, sendData)
 
-  command.stdout.pipe(process.stdout)
-  command.stdin.pipe(process.stdin)
-  command.stderr.pipe(process.stderr)
+  const { stdout, stdin, stderr } = spawn(COMMAND, ARGUMENTS)
+
+  addDataListener(stdout, sendData)
+  pipeStdio({ stdout, stdin, stderr })
 }
 
 start()
