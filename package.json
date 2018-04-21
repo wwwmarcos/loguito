@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eptaccio/node-lab.git"
+    "url": "git+https://github.com/eptaccio/loguito.git"
   },
   "bin": {
     "loguito": "cli.js"
@@ -17,9 +17,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eptaccio/node-lab/issues"
+    "url": "https://github.com/eptaccio/loguito/issues"
   },
-  "homepage": "https://github.com/eptaccio/node-lab#readme",
+  "homepage": "https://github.com/eptaccio/loguito#readme",
   "dependencies": {
     "axios": "^0.18.0",
     "fastify": "^1.3.0",
