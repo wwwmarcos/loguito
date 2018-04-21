@@ -5,7 +5,7 @@ const { buildMessageSessionIdErrorMessage } = require('./utils')
 app.post('/', async (req, res) => {
   const { data, sessionId, userId } = req.body
 
-  if (log.isSessionIdIsInUse({ sessionId, userId })) {
+  if (log.isSessionIdInUse({ sessionId, userId })) {
     return res.code(400).send({
       message: buildMessageSessionIdErrorMessage(sessionId)
     })
@@ -30,7 +30,7 @@ app.get('/:sessionId', async ({ params: { sessionId } }) => ({
 app.get('/check/:sessionId/:userId', async (req, res) => {
   const { sessionId, userId } = req.params
 
-  if (log.isSessionIdIsInUse({ sessionId, userId })) {
+  if (log.isSessionIdInUse({ sessionId, userId })) {
     return res.code(400).send(buildMessageSessionIdErrorMessage(sessionId))
   }
 
